@@ -2,20 +2,49 @@
 
 require __DIR__."/../vendor/autoload.php";
 
+use Symfony\Component\HttpFoundation\Request;
+use Application\Exception\SecurityException;
+use Symfony\Component\HttpFoundation\Response;
+
 $app = new Silex\Application();
 $app->register(new Application\Provider\DoctrineOrmProvider());
+
 $app->view(function(array $response) use ($app){
     return $app->json($response);
 });
 $app->error(function(\Exception $erro){
-    return new \Symfony\Component\HttpFoundation\Response('Oops, erro: '. $erro->getMessage(),500);
+    return new Response('Oops, erro: '. $erro->getMessage(),500);
+});
+$app->error(function (SecurityException $erro){
+    return new Response('Você é um intruso, '. $erro->getMessage(),404);
 });
 
+
+
+$app->post('/login', function(\Symfony\Component\HttpFoundation\Request $req)
+{ 
+    if($req->get('username') == 'root' && $req->get('password') == 'pass')
+    {
+        $jwt = Security\SecurityApp::EncodeJasonWebToken(['username' => $req->get('username')]);
+        return $jwt;
+    }
+    else
+    {
+        throw new Application\Exception\SecurityException("Credenciais inválidas !");
+    }
+});
+
+$app->get('/path/to/action',function(Symfony\Component\HttpFoundation\Request $req){
+    return ['uri' => $req->getPathInfo()];
+});
+
+$app->post('/decode',function (\Symfony\Component\HttpFoundation\Request $req){
+   return ['decoded' => Firebase\JWT\JWT::decode($req->headers->get('Autorization'), 'example_key', array('HS256'))] ;
+});
 
 $app->get('/',function(){
     return 'Hellow Darkness My Old Friend !';
 });
-
 
 $app->get('/post', function() use ($app){
     $posts = $app['em']->getRepository('Data\Entity\Post')->findAll();
@@ -33,7 +62,7 @@ $app->get('/post', function() use ($app){
     return $return;
 });
 
-$app->post('/post' , function(Symfony\Component\HttpFoundation\Request $request, Silex\Application $app){
+$app->post('/post' , function(Request $request, Silex\Application $app){
     $novoPost = new Data\Entity\Post();
     $novoPost->setAutor($request->get('autor'));
     $novoPost->setTexto($request->get('texto'));
@@ -43,6 +72,14 @@ $app->post('/post' , function(Symfony\Component\HttpFoundation\Request $request,
     $app['em']->flush();
     
     return 'Cadastro realizado com sucesso !';
+})->before(function(Request $req){
+    $var = $req->headers->get('Authorization');
+    if($var == null)
+    {
+        throw new SecurityException();
+    }
+    
+    Security\SecurityApp::VerifyJasonWebToken($var);
 });
 
 $app->get('/comentario/{postId}', function($postId , Silex\Application $app){
