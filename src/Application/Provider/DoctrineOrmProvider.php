@@ -50,7 +50,9 @@ class DoctrineOrmProvider extends ProviderBase implements ServiceProviderInterfa
             if(array_key_exists('ormmetadata',$value)) 
             {
                 if(array_key_exists('default',$value))
+                {
                     $this->registerEntityManager($app, $value, '');
+                }
                         
                 $this->registerEntityManager($app, $value, '.'.$key);
             }
@@ -69,14 +71,14 @@ class DoctrineOrmProvider extends ProviderBase implements ServiceProviderInterfa
     public static function bootstrapDoctrineEntityManager(array $connection, bool $isDevMode)
     {
         
-        $paths = array( realpath(ConfigApplication::getPathMetadataEntityAnnotation()));
+        $paths = array(realpath(ConfigApplication::getPathMetadataEntityAnnotation()));
         $reader = new AnnotationReader();
         $driver = new AnnotationDriver($reader, $paths);
         
         $config = Setup::createAnnotationMetadataConfiguration($paths , $isDevMode);
         $config->setMetadataDriverImpl($driver);
         $config->setEntityNamespaces([ConfigApplication::getEntityNamespace()]);
-
+        $config->setProxyDir(__DIR__.'/../../Data/Proxy');
         $entityManager= EntityManager::create($connection, $config);
 
         return $entityManager;

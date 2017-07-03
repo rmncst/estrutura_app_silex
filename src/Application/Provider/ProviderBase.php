@@ -13,8 +13,5 @@ namespace Application\Provider;
  */
 class ProviderBase {
     
-    public function teste(){
-        return "Lerigou";
-    }
     
 }
