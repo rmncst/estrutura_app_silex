@@ -79,8 +79,13 @@ class DoctrineOrmProvider extends ProviderBase implements ServiceProviderInterfa
         $config->setMetadataDriverImpl($driver);
         $config->setEntityNamespaces([ConfigApplication::getEntityNamespace()]);
         $config->setProxyDir(__DIR__.'/../../Data/Proxy');
+        
         $entityManager= EntityManager::create($connection, $config);
-
+        
+        $entityManager->getConnection()
+                ->getDatabasePlatform()
+                ->registerDoctrineTypeMapping('bit', 'boolean');
+        
         return $entityManager;
     }
     

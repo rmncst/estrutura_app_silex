@@ -3,6 +3,7 @@ namespace Security;
 
 use Firebase\JWT\JWT;
 use Application;
+use Application\Commom\ConfigApplication as config;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,13 +17,12 @@ use Application;
  * @author rmncst
  */
 class SecurityApp 
-{    
-    const KEY = 'example_key';    
+{
     const ALGO = 'HS256';
     
     public static function EncodeJasonWebToken(array $token)
     {
-        $jwt = JWT::encode($token, self::KEY , self::ALGO);
+        $jwt = JWT::encode($token, config::getSecretApp() , self::ALGO);
         
         return $jwt;       
     }
@@ -53,8 +53,8 @@ class SecurityApp
         return password_hash($password, PASSWORD_BCRYPT);
     }
     
-    public static function VerifyPassword(string $passord)
+    public static function VerifyPassword(string $passord, string $hash)
     {
-        return password_verify($passord, PASSWORD_BCRYPT, [self::ALGO]);
+        return password_verify($passord, $hash);
     }
 }

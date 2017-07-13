@@ -1,6 +1,8 @@
 <?php
 
 namespace Application\Provider;
+use Controller\HomeController;
+use Pimple\Container;
 
 /**
  * Description of RoutingProvider
@@ -10,38 +12,37 @@ namespace Application\Provider;
 class RoutingProvider implements \Pimple\ServiceProviderInterface 
 {    
     
-    public function register(\Pimple\Container $app) 
+    public function register(Container $app)
     {
         $this->registerServices($app);
         
-        $this->CrudRoutes($app, 'controller.post', "/post");
-        $this->CrudRoutes($app, 'controller.comentario', "/comentario");
-        
-        $app->get('/comentario/post/{postId}','controller.comentario:getAllByPost');
+        $app->get('/login','controller.autenticate:login');
+        $app->post('/login_auth','controller.autenticate:loginAutenticate');
+
+        $app->get('/','controller.home:index');
     }
     
-    public function CrudRoutes(\Pimple\Container $app , string $controller, string $prefix)
+    public function crudRoutes(Container $app , $controller, $prefix)
     {
-        $app->get($prefix.'/{id}',$controller.':get');
-        $app->get($prefix , $controller.':getAll');
-        $app->post($prefix ,$controller.':add');
-        $app->put($prefix, $controller.':update');
-        $app->delete($prefix, $controller.':delete');
+        $app->get($prefix,$controller.':index');
+        $app->get($prefix.'/{id}' , $controller.':get');
+        $app->post($prefix ,$controller.':save');
+        $app->post($prefix.'/{id}', $controller.':update');
+        $app->get($prefix.'/{id}', $controller.':delete');
     }
     
-    public function registerServices(\Pimple\Container $app)
+    public function registerServices(Container $app)
     {
-        
-        $app['controller.post'] = function () use($app)
+        $app['controller.autenticate'] = function () use($app)
         {
-            return new \Controller\PostController($app);
+            return new \Controller\AutenticateController($app);
         };
-        
-        $app['controller.comentario'] = function() use($app)
+
+        $app['controller.home'] = function () use($app)
         {
-            return new \Controller\ComentarioController($app);
+            return new HomeController($app);
         };
-        
+
     }
     
     

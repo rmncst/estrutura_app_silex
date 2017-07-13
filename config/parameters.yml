@@ -2,9 +2,9 @@ connections:
     con_oltp:
         ormmetadata: true
         default: true
-        dbname: 'webapidb'
-        user: 'webapiuser'
-        password: 'webapipass'
+        dbname: 'gat_autenticacaodb'
+        user: 'autenticacaodb_user'
+        password: 'fb2a1964fef7a'
         host: '127.0.0.1'
         driver: 'pdo_mysql'
     con_logger:
@@ -12,3 +12,4 @@ connections:
         dbname: 'webapi_logger'
         driver: 'sqlite'
 cli_connection: 'con_oltp'
+secret: 'e0cae0a5c3a2c58cf4a7b525fe7eca6f2e81e26dedcbcdacbd3486214d78871e' 

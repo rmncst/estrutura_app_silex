@@ -65,4 +65,14 @@ class ConfigApplication
     {
         return self::getPaths()['doctrine']['orm']['entity_namesapace'];
     }
+    
+    public static function getPathView()
+    {
+        return self::getRootPathApp().'src/View';
+    }
+
+    public static function getSecretApp()
+    {
+        return self::getParameters()['secret'];
+    }
 }

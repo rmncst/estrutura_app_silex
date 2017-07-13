@@ -1,7 +1,8 @@
 <?php
 
 namespace Controller;
-    
+use Pimple\Container;
+
 /**
  * Description of ControllerBase
  *
@@ -28,13 +29,18 @@ class ControllerBase
     protected $_em;
 
 
-    public function __construct(\Pimple\Container $app) {
+    public function __construct(Container $app) {
         $this->_app = $app;
         $this->_em = $app['em'];
     }
     
-    public function setRepository(string $repo)
+    public function setRepository($repo)
     {
         $this->_repo = $this->_em->getRepository($repo);
+    }
+    
+    protected function render($view, $params)
+    {
+        return $this->_app['twig']->render($view, $params);
     }
 }

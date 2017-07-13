@@ -1,2 +1,4 @@
-vendor
-public/node_modules
+
+/vendor/
+.idea/
+/public/node_modules/
